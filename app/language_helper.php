@@ -49,10 +49,10 @@ function charCodeAt($str, $index)
 function RL($a, $b)
 {
     for($c = 0; $c < strlen($b) - 2; $c +=3) {
-        $d = $b{$c+2};
+        $d = $b[$c+2];
         $d = $d >= 'a' ? charCodeAt($d,0) - 87 : intval($d);
-        $d = $b{$c+1} == '+' ? shr32($a, $d) : $a << $d;
-        $a = $b{$c} == '+' ? ($a + $d & 4294967295) : $a ^ $d;
+        $d = $b[$c+1] == '+' ? shr32($a, $d) : $a << $d;
+        $a = $b[$c] == '+' ? ($a + $d & 4294967295) : $a ^ $d;
     }
     return $a;
 }
