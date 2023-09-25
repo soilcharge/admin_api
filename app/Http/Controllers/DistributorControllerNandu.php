@@ -2040,7 +2040,7 @@ class DistributorControllerNandu extends Controller
         try
         {
              $result = OrderSummary::join('tbl_order_detail','tbl_order_detail.order_no','=','tbl_order_summary.order_no')
-            ->where('tbl_order_summary.order_no',$request->order_no)
+            ->where('tbl_order_summary.order_no','like','%'.$request->order_no.'%')
             ->where('tbl_order_summary.created_disctributor_id',$request->disctributor_id)
             ->where('tbl_order_summary.is_deleted','no')->get();
             $count=sizeof($result);
@@ -2076,7 +2076,7 @@ class DistributorControllerNandu extends Controller
         try
         {
              $result = SaleSummary::join('tbl_sale_detail','tbl_sale_detail.order_no','=','tbl_sale_summary.order_no')
-            ->where('tbl_sale_summary.order_no',$request->order_no)
+            ->where('tbl_sale_summary.order_no','like','%'.$request->order_no.'%')
             ->where('tbl_sale_summary.created_disctributor_id',$request->disctributor_id)
             ->where('tbl_sale_summary.is_deleted','no')->get();
             $count=sizeof($result);
@@ -2108,7 +2108,7 @@ class DistributorControllerNandu extends Controller
     // Download Language Brochure Search
     public function language_brochure_search(Request $request)
     {
-        $result = Downloads::where('title', 'like', '%' . $request->title . '%')->where('status', '=', 0)->where('content_type', '=', $request->content_type )->get();
+        $result = Downloads::where('title', 'like', '%' . $request->title . '%')->where('language', '=',$request->lang)->where('status', '=', 0)->where('content_type', '=', $request->content_type )->get();
 
         if (count($result) > 0)
         {
