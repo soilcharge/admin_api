@@ -29,6 +29,7 @@ use App\Model\ {
     Address
 };
 use DB;
+use Validator;
 use App\Http\Controllers\CommonController As CommonController;
 
 class DistributorController extends Controller
@@ -785,7 +786,31 @@ class DistributorController extends Controller
     
       public function farmer_registration_distributorapp(Request $request)
     {
-        
+        $validator = Validator::make($request->all(), [
+            'fname' => 'required',
+            'mname' => 'required',
+            'lname' => 'required',
+            'email' => 'required',
+            'password' => 'required',
+            'aadharcard' => 'required',
+            'phone' => 'required',
+            'state' => 'required',
+            'district' => 'required',
+            'taluka' => 'required',
+            'city' => 'required',
+            'address' => 'required',
+            'pincode' => 'required',
+            'crop' => 'required',
+            'acre' => 'required',
+            'created_by' => 'required',
+            'token' => 'required',
+        ]);
+
+        if ($validator->fails()) 
+        {
+            return $validator->errors()->all();
+        }
+
         $user = new User();
         $user->name = $request->fname." ".$request->mname." ".$request->lname." ";
         $user->email = $request->email;
@@ -823,7 +848,8 @@ class DistributorController extends Controller
         $users->save();
         
         $imagedataPath=DISTRIBUTOR_OWN_DOCUMENTS;
-        if ( !is_dir( $imagedataPath) ) 
+        // dd($imagedataPath);
+        if (!$imagedataPath) 
         {
             mkdir( $imagedataPath );
         }
