@@ -28,6 +28,7 @@ use App\Model\Language;
 use App\Model\Allvideo;
 use App\Model\ProductDetails;
 use App\Model\Downloads;
+use App\Model\WebVideos;
 use DB;
 use App\Http\Controllers\CommonController As CommonController;
 
@@ -1733,7 +1734,7 @@ class DistributorControllerNandu extends Controller
     
     public function allvideo(Request $request)
     {
-        $allvideo = Allvideo::where('is_deleted','no')->where('active','yes')->get();
+        $allvideo = WebVideos::where('status',0)->orderBy('id', 'DESC')->get();
       
         if ($allvideo)
         {
