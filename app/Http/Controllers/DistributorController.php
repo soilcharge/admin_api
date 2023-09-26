@@ -3273,7 +3273,7 @@ class DistributorController extends Controller
     {
         try
         {
-            $modelName = Subscriber::where('is_deleted','no')->get();
+            $modelName = Subscriber::where('is_deleted','no')->orderBy('id','DESC')->get();
             
             if ($modelName)
             {
