@@ -2040,12 +2040,45 @@ class DistributorControllerNandu extends Controller
     {
         try
         {
-             $result = OrderSummary::join('tbl_order_detail','tbl_order_detail.order_no','=','tbl_order_summary.order_no')
-            ->where('tbl_order_summary.order_no','like','%'.$request->order_no.'%')
-            ->where('tbl_order_summary.created_disctributor_id',$request->disctributor_id)
-            ->where('tbl_order_summary.is_deleted','no')->get();
-            $count=sizeof($result);
-            if ($count>0)
+            // $temp = [];
+            // $result = OrderSummary::where('tbl_order_summary.order_no','like','%'.$request->order_no.'%')
+            // ->where('tbl_order_summary.created_disctributor_id',$request->disctributor_id)
+            // ->where('tbl_order_summary.is_deleted','no')->first();
+            // $data=[];
+            // $data['id'] = $result['id'];
+            // $data['order_no'] = $result['order_no'];
+            // $data['order_date'] = $result['order_date'];
+            // $data['created_disctributor_amount'] = $result['created_disctributor_amount'];
+            // $data['total_items'] = OrderDetail::where('order_no','like','%'.$result['order_no'].'%')->count();
+            // array_push($temp,$data);
+
+            $result = OrderSummary::where('is_deleted','no')
+                        ->where('tbl_order_summary.order_no','like','%'.$request->order_no.'%')
+                        ->where('created_disctributor_id',$request->disctributor_id)
+                        ->get();
+            
+            foreach($result as $key=>$resultnew)
+            {
+                try
+                {
+                    $details=$this->commonController->getUserNameById($resultnew->created_disctributor_id);                        
+                    $resultnew->fname=$details->fname;
+                    $resultnew->mname=$details->mname;
+                    $resultnew->lname=$details->lname;
+                    
+                } catch(Exception $e) {
+                    return response()->json([
+                            "data" => '',
+                            "result" => false,
+                            "error" => true,
+                            "message" =>$e->getMessage()." ".$e->getCode()
+                        ]);
+                   
+                 }
+            }
+
+
+            if (!empty($result))
             {
                  return response()->json([
                     "data" => $result,
@@ -2076,13 +2109,40 @@ class DistributorControllerNandu extends Controller
     {
         try
         {
-             $result = SaleSummary::join('tbl_sale_detail','tbl_sale_detail.order_no','=','tbl_sale_summary.order_no')
+           
+           
+
+
+            $result = SaleSummary::where('is_deleted','no')
             ->where('tbl_sale_summary.order_no','like','%'.$request->order_no.'%')
-            ->where('tbl_sale_summary.created_disctributor_id',$request->disctributor_id)
-            ->where('tbl_sale_summary.is_deleted','no')->get();
-            $count=sizeof($result);
-            if ($count>0)
+            ->where('created_disctributor_id',$request->disctributor_id)
+            ->get();
+
+                foreach($result as $key=>$resultnew)
+                {
+                    try
+                    {
+                        $details=$this->commonController->getUserNameById($resultnew->created_disctributor_id);                        
+                        $resultnew->fname=$details->fname;
+                        $resultnew->mname=$details->mname;
+                        $resultnew->lname=$details->lname;
+                        
+                    } catch(Exception $e) {
+                        return response()->json([
+                                "data" => '',
+                                "result" => false,
+                                "error" => true,
+                                "message" =>$e->getMessage()." ".$e->getCode()
+                            ]);
+                    
+                    }
+                }
+
+
+    
+            if (!empty($result))
             {
+               
                  return response()->json([
                     "data" => $result,
                     "result" => true,
