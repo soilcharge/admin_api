@@ -5,26 +5,29 @@ use Exception;
 use JWTAuth;
 use App\Task;
 use Illuminate\Http\Request;
-use App\Model\UsersInfo;
 use App\User;
-use App\Model\FarmerMeeting;
-use App\Model\DistributorMeeting;
-use App\Model\TargetVideos;
-use App\Model\TargetVideosToDistributor;
-use App\Model\FarmerVistByDistributor;
-use App\Model\SCTResult;
-use App\Model\WebAgency;
-use App\Model\Subscriber;
-use App\Model\Downloads;
-use App\Model\Language;
-use App\Model\Product;
-use App\Model\SubscriberTarget;
-use App\Model\WebBlog;
-use App\Model\Messages;
-use App\Model\Complaint;
-use App\Model\Notification;
-use App\Model\Address;
-use App\Model\Dist_Promotion_Demotion;
+use App\Model\ {
+    Dist_Promotion_Demotion,
+    FrontProduct,ProductDetails,
+    UsersInfo,
+    FarmerMeeting,
+    DistributorMeeting,
+    TargetVideos,
+    TargetVideosToDistributor,
+    FarmerVistByDistributor,
+    SCTResult,
+    WebAgency,
+    Subscriber,
+    Downloads,
+    Language,
+    Product,
+    SubscriberTarget,
+    WebBlog,
+    Messages,
+    Complaint,
+    Notification,
+    Address
+};
 use DB;
 use App\Http\Controllers\CommonController As CommonController;
 
@@ -3624,7 +3627,7 @@ class DistributorController extends Controller
         }
     }
     
-    public function distributorproductsearch_distributorapp(Request $request)
+    public function distributorproductsearch_distributorapp_old(Request $request)
     {
         try 
         {
@@ -3632,11 +3635,32 @@ class DistributorController extends Controller
                             ->where('is_deleted','=','no')
                             ->get();
                             
-           
+            $temp =[];
             if (count($details)>0)
             {
+                foreach ($details as $key => $value) 
+                {
+            
+                    $data                      = [];
+                    $data['id']                = $value->id;
+                    $data['title']                = $value->title;
+                    $data['content']                = $value->content;
+                    $data['long_description']       = $value->content;
+                    $data['short_description']       = $value->content;
+                    $data['photo_one']       = $value->photo_one;
+                    $data['photo_two']       = $value->photo_two;
+                    $data['photo_three']       = $value->photo_three;
+                    $data['photo_four']       = $value->photo_four;
+                    $data['photo_five']       = $value->photo_five;
+                    $data['link']       = $value->link;
+                    $data['photopath'] = '//finalapi.soilchargertechnology.com/public/uploads/web/product/'.$value->photo_one;
+                   
+                    $data['product_details']     = \DB::table('tbl_product_details')
+                                                ->where(['product_id'=>$value->id])->get();
+                    array_push($temp, $data);  
+                }
                  return response()->json([
-                    "data" => $details,
+                    "data" => $temp,
                     "result" => true,
                     "message" => 'Information Get Successfully'
                 ]);
@@ -3661,6 +3685,95 @@ class DistributorController extends Controller
         }
     }
     
+    public function distributorproductsearch_distributorapp(Request $request)
+    {
+        try
+        {
+         
+            $result = DB::table('tbl_product')
+                    ->select('title','photo_one','id')
+                    ->where('title','like', '%' . $request->text_to_search . '%' )
+                    ->distinct('title')
+                    ->get();
+
+            
+                foreach ($result as $key => $value) {
+
+                    $front_product_details = FrontProduct::where('product_id',$value->id)->select('short_description','long_description')->first();
+
+                    $value->product_id = $value->id;
+                    $value->short_description = $front_product_details ? $front_product_details->short_description  : '';
+                    $value->long_description = $front_product_details ? $front_product_details->long_description : '';
+                    $value->photopath=PRODUCT_CONTENT_VIEW.$value->photo_one;
+                    $data_count = ProductDetails::join('tbl_product','tbl_product_details.product_id','=','tbl_product.id')
+                                                    ->where('tbl_product_details.is_deleted','no')
+                                                    ->where('tbl_product.title',$value->title)
+                                                    ->where('tbl_product.is_deleted','no')
+                                                    ->orderBy('tbl_product.id', 'DESC')
+                                                    //->select('tbl_product_details.*','tbl_product.title','tbl_product.content','tbl_product.link','tbl_product.photo_one')
+                                                    ->get();
+                                                    // ->count();
+                    
+                    $value->product_details = $data_count;
+                }
+
+          
+            if ($result)
+            {
+                 return response()->json([
+                    "data" => $result,
+                    "result" => true,
+                    "message" => 'Information get Successfully'
+                ]);
+            }
+            else
+            {
+                 return response()->json([
+                    "data" => '',
+                    "result" => false,
+                    "message" => 'Information not found'
+                ]);
+                
+            }
+        }
+        catch(Exception $e) {
+          return  'Message: ' .$e->getMessage();
+        }
+        
+        //  try
+        // {
+        //     $result = ProductDetails::join('tbl_product','tbl_product_details.product_id','=','tbl_product.id')
+        //         ->where('tbl_product_details.is_deleted','no')
+        //         ->select('tbl_product_details.*','tbl_product.title','tbl_product.content','tbl_product.link')
+        //         ->get();
+
+        //     //dd($result);
+        //     foreach($result as $key=>$value)
+        //     {
+        //         $value->photopath=PRODUCT_CONTENT_VIEW.$value->photo_one;
+        //     }
+        //     if ($result)
+        //     {
+        //          return response()->json([
+        //             "data" => $result,
+        //             "result" => true,
+        //             "message" => 'Information get Successfully'
+        //         ]);
+        //     }
+        //     else
+        //     {
+        //          return response()->json([
+        //             "data" => '',
+        //             "result" => false,
+        //             "message" => 'Information not found'
+        //         ]);
+                
+        //     }
+        // }
+        // catch(Exception $e) {
+        //   return  'Message: ' .$e->getMessage();
+        // }
+    }
     
     public function distributorlistundercount_distributor(Request $request)
     {
