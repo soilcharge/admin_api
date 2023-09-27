@@ -406,6 +406,7 @@ class DistributorMobileAppController extends Controller
         {
              $result = OrderSummary::where('is_deleted','no')
                         ->where('created_disctributor_id',$request->created_disctributor_id)
+                        ->orderBy('id','DESC')
                         ->get();
             
             foreach($result as $key=>$resultnew)
