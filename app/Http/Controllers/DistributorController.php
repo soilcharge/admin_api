@@ -629,7 +629,8 @@ class DistributorController extends Controller
             $value->taluka=$talukaName->name;
             
             $cityName=$this->commonController->getAreaNameById($value->city);
-            $value->city=$cityName->name;
+            
+            $value->city=isset($cityName->name)?$cityName:'-';
         }
         // dd($result);
         if (count($result) > 0)
