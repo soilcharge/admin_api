@@ -665,14 +665,24 @@ class FrontController extends Controller
     {
         try
         {
-            
-            $result = FrontProduct::join('tbl_product_details','tbl_product_details.id','=','front_product.product_id')
-            ->join('tbl_product','tbl_product.id','=','tbl_product_details.product_id')
-            ->where('front_product.is_deleted','no')
-            ->where('tbl_product.is_deleted','no')
-            ->where('tbl_product_details.is_deleted','no')
+                if(!empty($request->prod)){
+                    $result = FrontProduct::join('tbl_product_details','tbl_product_details.id','=','front_product.product_id')
+                    ->join('tbl_product','tbl_product.id','=','tbl_product_details.product_id')
+                    ->where('front_product.is_deleted','no')
+                    ->where('tbl_product.is_deleted','no')
+                    ->where('tbl_product.id',$request->prod)
+                    ->where('tbl_product_details.is_deleted','no')
                     ->select('front_product.*','tbl_product.id','tbl_product.title','tbl_product.photo_one')
-                ->get();
+                    ->get();
+                }else{
+                    $result = FrontProduct::join('tbl_product_details','tbl_product_details.id','=','front_product.product_id')
+                    ->join('tbl_product','tbl_product.id','=','tbl_product_details.product_id')
+                    ->where('front_product.is_deleted','no')
+                    ->where('tbl_product.is_deleted','no')
+                    ->where('tbl_product_details.is_deleted','no')
+                    ->select('front_product.*','tbl_product.id','tbl_product.title','tbl_product.photo_one')
+                    ->get();
+                }
 
             foreach($result as $key=>$value)
             {
