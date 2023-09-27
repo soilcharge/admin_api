@@ -585,7 +585,13 @@ class FrontController extends Controller
     {
         try
         {
-            $result = WebBlog::where(['status'=>'0','articleorschedule' =>'article'])->orderBy('id', 'DESC')->get();
+            if(!empty($request->id)){
+                $result = WebBlog::where(['id'=>$request->id,'status'=>'0','articleorschedule' =>'article'])->orderBy('id', 'DESC')->get();
+
+            }else{
+                $result = WebBlog::where(['status'=>'0','articleorschedule' =>'article'])->orderBy('id', 'DESC')->get();
+
+            }
             foreach($result as $key=>$value)
             {
                 $value->photopath=BLOG_CONTENT_VIEW.$value->photo_one;
