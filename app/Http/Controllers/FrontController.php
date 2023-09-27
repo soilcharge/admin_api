@@ -201,7 +201,46 @@ class FrontController extends Controller
     }
     
     
-    
+    public function frontproductget(Request $request)
+
+     {
+        try
+        {
+            $result = FrontProduct::join('tbl_product','tbl_product.id','=','front_product.product_id')
+                ->where('tbl_product.is_deleted','no')
+                ->where('front_product.is_deleted','no')
+                ->select('front_product.*','tbl_product.title','tbl_product.photo_one')
+                ->where('front_product.id',$request->id)
+                ->orderBy('tbl_product.id', 'DESC')
+                ->get();
+            
+            foreach($result as $key=>$value)
+            {
+                $value->photopath=FRONTPRODUCT_CONTENT_VIEW.$value->photo;
+                // $value->productphotopath=PRODUCT_CONTENT_VIEW.$value->photo_one;
+            }
+            if ($result)
+            {
+                 return response()->json([
+                    "data" => $result,
+                    "result" => true,
+                    "message" => 'Information get Successfully'
+                ]);
+            }
+            else
+            {
+                 return response()->json([
+                    "data" => '',
+                    "result" => false,
+                    "message" => 'Information not found'
+                ]);
+                
+            }
+        }
+        catch(Exception $e) {
+          return  'Message: ' .$e->getMessage();
+        }
+    }
     
     public function frontmissionlist(Request $request)
     {
@@ -632,7 +671,7 @@ class FrontController extends Controller
             ->where('front_product.is_deleted','no')
             ->where('tbl_product.is_deleted','no')
             ->where('tbl_product_details.is_deleted','no')
-                    ->select('front_product.*','tbl_product.title','tbl_product.photo_one')
+                    ->select('front_product.*','tbl_product.id','tbl_product.title','tbl_product.photo_one')
                 ->get();
 
             foreach($result as $key=>$value)

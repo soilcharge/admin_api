@@ -71,6 +71,7 @@ Route::post('checkemailexist', 'CommonController@checkemailexist');
     Route::post('frontenquiryadd', 'FrontController@frontenquiryadd');
     // Route::get('frontenquiryget', 'FrontController@frontenquiryget');
     Route::post('frontproductreviewadd', 'FrontController@frontproductreviewadd');
+    Route::post('frontproductget', 'FrontController@frontproductget');
     Route::post('frontblogreplyadd', 'FrontController@frontblogreplyadd');
     Route::post('frontinternshipadd', 'FrontController@frontinternshipadd');
     Route::post('frontjobpostingadd', 'FrontController@frontjobpostingadd');
