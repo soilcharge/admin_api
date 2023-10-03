@@ -509,6 +509,9 @@ Route::group(["middleware" => "auth.jwt"], function () {
     
     //Report
     Route::post('websalesreport', 'WebAPIController@websalesreport');
+    Route::post('reportsales', 'WebAPIController@reportsales');
+
+    
     Route::post('webdistributorrderreport', 'WebAPIController@webdistributorrderreport');
     Route::post('weballorderreport', 'WebAPIController@weballorderreport');
     Route::post('weballorderconfirmnotdispatchedreport', 'WebAPIController@weballorderconfirmnotdispatchedreport');
