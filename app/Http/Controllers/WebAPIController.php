@@ -4116,7 +4116,6 @@ class WebAPIController extends Controller
             $totalamount=0;
 
             $result=\App\Model\SaleSummary::query()
-              ->where('tbl_sale_summary.account_approved','yes')
               ->where('tbl_sale_summary.is_deleted','no')
               
                ->when($request->get('datefrom'), function($query) use ($request) {
