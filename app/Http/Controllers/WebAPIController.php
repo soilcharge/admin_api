@@ -4176,6 +4176,76 @@ class WebAPIController extends Controller
           return  'Message: ' .$e->getMessage();
         }
     }
+
+    public function viewreportsales(Request $request)
+    {
+        try
+        {
+            $datefrom=$request->datefrom;
+            $dateto=$request->dateto;
+            $totalamount=0;
+
+            $result=\App\Model\SaleSummary::query()
+              ->where('tbl_sale_summary.is_deleted','no')
+              ->where('tbl_sale_summary.id',$request->id)
+               ->when($request->get('datefrom'), function($query) use ($request) {
+                   //$query->whereBetween('order_date', [$request->datefrom.' 00:00:00',$request->dateto.' 23:59:59']);
+                   $query->whereBetween('order_date', [$request->datefrom,$request->dateto]);
+                }) 
+                
+               ->get();
+                                   
+            
+            foreach($result as $key=>$resultnew)
+            {
+                try
+                {
+                    $details=$this->commonController->getUserNameById($resultnew->created_disctributor_id);                        
+                    $resultnew->fname=$details->fname;
+                    $resultnew->mname=$details->mname;
+                    $resultnew->lname=$details->lname;
+                    
+                    $totalamount=$totalamount+$resultnew->created_disctributor_amount;
+                    
+                } catch(Exception $e) {
+                    return response()->json([
+                            "data" => '',
+                            "result" => false,
+                            "error" => true,
+                            "message" =>$e->getMessage()." ".$e->getCode()
+                        ]);
+                   
+                 }
+            }
+            
+            // $result['totalamount']=$totalamount;
+
+            if ($result)
+            {
+                 return response()->json([
+                    "data" => $result,
+                    "totalorder" => count($result),
+                    "totalamount" => $totalamount,
+                    "datefrom" => $request->datefrom,
+                    "dateto" => $request->dateto,
+                    "result" => true,
+                    "message" => 'Information get Successfully'
+                ]);
+            }
+            else
+            {
+                 return response()->json([
+                    "data" => '',
+                    "result" => false,
+                    "message" => 'Information not found'
+                ]);
+                
+            }
+        }
+        catch(Exception $e) {
+          return  'Message: ' .$e->getMessage();
+        }
+    }
     
     
     
