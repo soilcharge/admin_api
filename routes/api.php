@@ -510,6 +510,9 @@ Route::group(["middleware" => "auth.jwt"], function () {
     //Report
     Route::post('websalesreport', 'WebAPIController@websalesreport');
     Route::post('reportsales', 'WebAPIController@reportsales');
+    Route::post('viewreportsales', 'WebAPIController@viewreportsales');
+
+    
 
     
     Route::post('webdistributorrderreport', 'WebAPIController@webdistributorrderreport');
