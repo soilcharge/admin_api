@@ -4187,8 +4187,9 @@ class WebAPIController extends Controller
 
             $result=\App\Model\SaleSummary::query()
               ->where('tbl_sale_summary.is_deleted','no')
-              ->where('tbl_sale_summary.id',$request->id)
-               ->when($request->get('datefrom'), function($query) use ($request) {
+              ->where('tbl_sale_summary.order_no',$request->order_no)
+              ->where('tbl_sale_summary.created_disctributor_id',$request->created_disctributor_id)
+              ->when($request->get('datefrom'), function($query) use ($request) {
                    //$query->whereBetween('order_date', [$request->datefrom.' 00:00:00',$request->dateto.' 23:59:59']);
                    $query->whereBetween('order_date', [$request->datefrom,$request->dateto]);
                 }) 
