@@ -400,7 +400,7 @@ class DistributorMobileAppController extends Controller
 
     }
     
-    public function orderlist_mobileapp(Request $request)
+    public function old_orderlist_mobileapp(Request $request)
     {
         try
         {
@@ -452,6 +452,63 @@ class DistributorMobileAppController extends Controller
         }
     }
     
+    public function orderlist_mobileapp(Request $request)
+    {
+        try
+        {
+            $result = OrderSummary::where('order_no',$request->order_no)
+            ->where('tbl_order_summary.created_disctributor_id',$request->created_disctributor_id)
+            ->where('tbl_order_summary.is_deleted','no')->get();
+        
+            foreach($result as $key=>$value)
+            {
+                //$value->all_product = OrderDetail::where('order_no',$request->order_no)->get();
+                
+                $value->all_product = OrderDetail::where('tbl_order_detail.order_no',$request->order_no)
+                                    ->where('tbl_order_detail.is_deleted','no')
+                                    ->join('tbl_product','tbl_product.id','=','tbl_order_detail.prod_id')
+                                    ->get();
+                try
+                {
+                    $details=$this->commonController->getUserNameById($value->created_disctributor_id);                        
+                    $value->fname=$details->fname;
+                    $value->mname=$details->mname;
+                    $value->lname=$details->lname;
+                    
+                } catch(Exception $e) {
+                    return response()->json([
+                            "data" => '',
+                            "result" => false,
+                            "error" => true,
+                            "message" =>$e->getMessage()." ".$e->getCode()
+                        ]);
+                    
+                    }
+
+            }
+            
+            if ($result)
+            {
+                 return response()->json([
+                    "data" => $result,
+                    "result" => true,
+                    "message" => 'Information get Successfully'
+                ]);
+            }
+            else
+            {
+                 return response()->json([
+                    "data" => '',
+                    "result" => false,
+                    "message" => 'Information not found'
+                ]);
+                
+            }
+        }
+        catch(Exception $e) {
+          return  'Message: ' .$e->getMessage();
+        }
+    }
     
      public function orderdetail_mobileapp(Request $request)
     {
