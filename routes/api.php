@@ -182,6 +182,7 @@ Route::group(["middleware" => "auth.jwt"], function () {
     Route::post('orderget_mobileapp', 'DistributorMobileAppController@orderget_mobileapp');
     Route::post('orderdelete_mobileapp', 'DistributorMobileAppController@orderdelete_mobileapp');
     Route::post('orderlist_mobileapp', 'DistributorMobileAppController@orderlist_mobileapp');
+    Route::post('orderview_mobileapp', 'DistributorMobileAppController@orderview_mobileapp');
     Route::post('orderdetail_mobileapp', 'DistributorMobileAppController@orderdetail_mobileapp');
  
     
