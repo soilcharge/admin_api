@@ -1426,7 +1426,63 @@ class DistributorControllerNandu extends Controller
         }
     }
     
-    
+    public function saleview_mobileapp(Request $request)
+    {
+        try
+        {
+            $result = SaleSummary::where('order_no',$request->order_no)
+            ->where('tbl_sale_summary.created_disctributor_id',$request->created_disctributor_id)
+            ->where('tbl_sale_summary.is_deleted','no')->get();
+        
+            foreach($result as $key=>$value)
+            {
+                //$value->all_product = OrderDetail::where('order_no',$request->order_no)->get();
+                
+                $value->all_product = SaleDetail::where('tbl_sale_detail.order_no',$request->order_no)
+                                    ->where('tbl_sale_detail.is_deleted','no')
+                                    ->join('tbl_product','tbl_product.id','=','tbl_sale_detail.prod_id')
+                                    ->get();
+                try
+                {
+                    $details=$this->commonController->getUserNameById($value->created_disctributor_id);                        
+                    $value->fname=$details->fname;
+                    $value->mname=$details->mname;
+                    $value->lname=$details->lname;
+                    
+                } catch(Exception $e) {
+                    return response()->json([
+                            "data" => '',
+                            "result" => false,
+                            "error" => true,
+                            "message" =>$e->getMessage()." ".$e->getCode()
+                        ]);
+                    
+                    }
+
+            }
+            
+            if ($result)
+            {
+                 return response()->json([
+                    "data" => $result,
+                    "result" => true,
+                    "message" => 'Information get Successfully'
+                ]);
+            }
+            else
+            {
+                 return response()->json([
+                    "data" => '',
+                    "result" => false,
+                    "message" => 'Information not found'
+                ]);
+                
+            }
+        }
+        catch(Exception $e) {
+          return  'Message: ' .$e->getMessage();
+        }
+    }
     
     // Sale Update
     public function saleupdate_mobileapp(Request $request)

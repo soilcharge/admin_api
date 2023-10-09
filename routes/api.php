@@ -246,6 +246,7 @@ Route::group(["middleware" => "auth.jwt"], function () {
     Route::post('saledelete_mobileapp', 'DistributorControllerNandu@saledelete_mobileapp');
     Route::post('saleupdate_mobileapp', 'DistributorControllerNandu@saleupdate_mobileapp');
     Route::post('salelist_mobileapp', 'DistributorControllerNandu@salelist_mobileapp');
+    Route::post('saleview_mobileapp', 'DistributorControllerNandu@saleview_mobileapp');
     Route::post('allsaleproductlist_mobileapp', 'DistributorControllerNandu@allsaleproductlist_mobileapp');
     Route::post('allorderproductlist_by_distributor_mobileapp', 'DistributorControllerNandu@allorderproductlist_by_distributor_mobileapp');
     Route::post('allproductlistofdistributor', 'DistributorControllerNandu@allproductlistofdistributor_mobileapp');
