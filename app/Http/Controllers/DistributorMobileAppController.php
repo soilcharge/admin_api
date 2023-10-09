@@ -35,56 +35,31 @@ class DistributorMobileAppController extends Controller
     }
     
    
-     public function allproductlist_mobileapp_old(Request $request)
+     public function allproductlist_mobileapp(Request $request)
     {
         try
         {
-            // $result = ProductDetails::join('tbl_product','tbl_product_details.product_id','=','tbl_product.id')
-            //     ->where('tbl_product_details.is_deleted','no')
-            //     ->select('tbl_product_details.*','tbl_product.title','tbl_product.content','tbl_product.link','tbl_product.photo_one')
-            //     ->get();
-
-            //dd($result);
-
-
-
-            //New Changes
-
+        
             $result = DB::table('tbl_product')
                     ->select('title','photo_one','id')
                     ->distinct('title')
                     ->get();
-
-                // Product::select('tbl_product.title','tbl_product.id')
-                // ->distinct('tbl_product.title')
-                // ->get();
-
                 foreach ($result as $key => $value) {
-
                     $front_product_details = FrontProduct::where('product_id',$value->id)->select('short_description','long_description')->first();
                     info($front_product_details);
                     $value->product_id = $value->id;
                     $value->short_description = $front_product_details ? $front_product_details->short_description  : '';
                     $value->long_description = $front_product_details ? $front_product_details->long_description : '';
                     $value->photopath=PRODUCT_CONTENT_VIEW.$value->photo_one;
-                    // $data_count = ProductDetails::where("product_id",$value->id)->get()->count();
                     $data_count = ProductDetails::join('tbl_product','tbl_product_details.product_id','=','tbl_product.id')
                                                     ->where('tbl_product_details.is_deleted','no')
                                                     ->where('tbl_product.title',$value->title)
                                                     ->where('tbl_product.is_deleted','no')
                                                     ->orderBy('tbl_product.id', 'DESC')
-                                                    //->select('tbl_product_details.*','tbl_product.title','tbl_product.content','tbl_product.link','tbl_product.photo_one')
                                                     ->get();
-                                                    // ->count();
                     
                     $value->product_details = $data_count;
                 }
-
-            //New changes end 
-            // foreach($result as $key=>$value)
-            // {
-            //     $value->photopath=PRODUCT_CONTENT_VIEW.$value->photo_one;
-            // }
             if ($result)
             {
                  return response()->json([
@@ -106,43 +81,10 @@ class DistributorMobileAppController extends Controller
         catch(Exception $e) {
           return  'Message: ' .$e->getMessage();
         }
-        
-        //  try
-        // {
-        //     $result = ProductDetails::join('tbl_product','tbl_product_details.product_id','=','tbl_product.id')
-        //         ->where('tbl_product_details.is_deleted','no')
-        //         ->select('tbl_product_details.*','tbl_product.title','tbl_product.content','tbl_product.link')
-        //         ->get();
-
-        //     //dd($result);
-        //     foreach($result as $key=>$value)
-        //     {
-        //         $value->photopath=PRODUCT_CONTENT_VIEW.$value->photo_one;
-        //     }
-        //     if ($result)
-        //     {
-        //          return response()->json([
-        //             "data" => $result,
-        //             "result" => true,
-        //             "message" => 'Information get Successfully'
-        //         ]);
-        //     }
-        //     else
-        //     {
-        //          return response()->json([
-        //             "data" => '',
-        //             "result" => false,
-        //             "message" => 'Information not found'
-        //         ]);
-                
-        //     }
-        // }
-        // catch(Exception $e) {
-        //   return  'Message: ' .$e->getMessage();
-        // }
+       
     }
     
-    public function allproductlist_mobileapp(Request $request)
+    public function allproductlist_mobileapp_new(Request $request)
     {
         try
         {
