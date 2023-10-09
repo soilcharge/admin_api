@@ -3082,16 +3082,6 @@ class WebAPIController extends Controller
                 ->orderBy('tbl_product.id', 'DESC')
                 ->get();
                 
-            // $result = ProductDetails::select(DB::raw('SUM(tbl_product_details.quantity) as quantity'))
-            //     ->join('tbl_product','tbl_product_details.product_id','=','tbl_product.id')
-            //     // ->join('usersinfo','usersinfo.id','=','tbl_order_summary.created_disctributor_id')
-            //      ->select('tbl_product_details.*','tbl_product.title','tbl_product.content','tbl_product.link')
-            //     // ->where('tbl_product.created_disctributor_id',$request->created_disctributor_id)
-            //     ->where('tbl_product.is_deleted','no')
-            //     ->groupBy('tbl_product.title')
-            //     ->pluck('quantity');
-
-            //dd($result);
             foreach($result as $key=>$value)
             {
                 $value->photopath=PRODUCT_CONTENT_VIEW.$value->photo_one;
@@ -3610,8 +3600,24 @@ class WebAPIController extends Controller
                                     ->where('tbl_order_detail.is_deleted','no')
                                     ->join('tbl_product','tbl_product.id','=','tbl_order_detail.prod_id')
                                     ->get();
+                try
+                {
+                    $details=$this->commonController->getUserNameById($value->created_disctributor_id);                        
+                    $value->fname=$details->fname;
+                    $value->mname=$details->mname;
+                    $value->lname=$details->lname;
+                    
+                } catch(Exception $e) {
+                    return response()->json([
+                            "data" => '',
+                            "result" => false,
+                            "error" => true,
+                            "message" =>$e->getMessage()." ".$e->getCode()
+                        ]);
+                    
+                    }
+
             }
-            
             
             if ($result)
             {
