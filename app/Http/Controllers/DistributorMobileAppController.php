@@ -35,7 +35,7 @@ class DistributorMobileAppController extends Controller
     }
     
    
-     public function allproductlist_mobileapp(Request $request)
+     public function allproductlist_mobileapp_old(Request $request)
     {
         try
         {
@@ -142,7 +142,7 @@ class DistributorMobileAppController extends Controller
         // }
     }
     
-    public function allproductlist_mobileapp_new(Request $request)
+    public function allproductlist_mobileapp(Request $request)
     {
         try
         {
