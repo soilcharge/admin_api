@@ -456,8 +456,7 @@ class DistributorMobileAppController extends Controller
     {
         try
         {
-            $result = OrderSummary::where('order_no',$request->order_no)
-            ->where('tbl_order_summary.created_disctributor_id',$request->created_disctributor_id)
+            $result = OrderSummary::where('tbl_order_summary.created_disctributor_id',$request->created_disctributor_id)
             ->where('tbl_order_summary.is_deleted','no')->get();
         
             foreach($result as $key=>$value)
