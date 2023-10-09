@@ -463,7 +463,7 @@ class DistributorMobileAppController extends Controller
             {
                 //$value->all_product = OrderDetail::where('order_no',$request->order_no)->get();
                 
-                $value->all_product = OrderDetail::where('tbl_order_detail.order_no',$request->order_no)
+                $value->all_product = OrderDetail::where('tbl_order_detail.order_no',$value->order_no)
                                     ->where('tbl_order_detail.is_deleted','no')
                                     ->join('tbl_product','tbl_product.id','=','tbl_order_detail.prod_id')
                                     ->get();
