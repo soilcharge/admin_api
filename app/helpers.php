@@ -358,11 +358,11 @@ function getSettings($type='')
  * @return [type] [description]
  */
 
- function send_notification($message,$send_to)
+ function send_notification($sendmsg,$send_to)
  {
-    
-     $userToken = App\User::select('app_token')->where(['id'=>$send_to,'is_block'=>'no','is_approved'=>'yes','is_deleted'=>'no', ])->get()->toArray();
-     $userId = App\User::select('id')->where(['id'=>$send_to,'is_block'=>'no','is_approved'=>'yes','is_deleted'=>'no', ])->get()->toArray();
+    // dd($send_to);
+     $userToken = App\User::where(['id'=>$send_to,'is_block'=>'no','is_approved'=>'yes','is_deleted'=>'no', ])->pluck('app_token')->toArray();
+     $userId = App\User::where(['id'=>$send_to,'is_block'=>'no','is_approved'=>'yes','is_deleted'=>'no', ])->pluck('id')->toArray();
 
      $fcm_server_keyFinal='AAAAog8TE8Y:APA91bFVPjkXqCY_Mube2butwlOz3x5RaVaJv5JYDXHV9AtJK96kFPrKZp3LCKqgG7PlZcWDqywPGlDUTkWBajmmoqqtxOAJkCmBbTyki8r6axzrF2i67oY3muMujYkaav3AYIKPwQJG';
      $title='Soil Charge Technology';
@@ -370,12 +370,13 @@ function getSettings($type='')
      
      $message = [
              'title' => $title,
-             'body' => $message,
+             'body' => $sendmsg,
              'icon' => $icon ,
              'actions'=>'',
              
          ];
      
+    //  dd($userToken);
     
      $fields = array(
          'registration_ids' => $userToken,
@@ -400,6 +401,7 @@ function getSettings($type='')
      curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
  
      $result = curl_exec($ch);
+    //  dd($result);
      if ($result === false) {
          die('Curl failed:' . curl_errno($ch));
         
@@ -410,10 +412,9 @@ function getSettings($type='')
 
      foreach($userId as $key=>$userIdNew)
      {
-
-         $Notificationdetails = new Notification();
+         $Notificationdetails = new \App\Model\Notification();
          $Notificationdetails->distributor_id = $userIdNew;
-         $Notificationdetails->message =$message;
+         $Notificationdetails->message =$sendmsg;
          $Notificationdetails->save();
      }
  }
