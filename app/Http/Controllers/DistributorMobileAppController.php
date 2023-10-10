@@ -354,6 +354,13 @@ class DistributorMobileAppController extends Controller
             
             foreach($result as $key=>$resultnew)
             {
+                if($resultnew->account_approved=='no' && $resultnew->forward_to_warehouse=='no'){
+                    $resultnew->status = 'Pending';
+                }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='no'){
+                    $resultnew->status = 'Verified';
+                }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='yes'){
+                    $resultnew->status = 'Forwaded to warehouse';
+                }
                 try
                 {
                     $details=$this->commonController->getUserNameById($resultnew->created_disctributor_id);                        
