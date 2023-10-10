@@ -1463,7 +1463,13 @@ class DistributorControllerNandu extends Controller
             foreach($result as $key=>$value)
             {
                 //$value->all_product = OrderDetail::where('order_no',$request->order_no)->get();
-                
+                if($value->account_approved=='no' && $value->forward_to_warehouse=='no'){
+                    $value->status = 'Pending';
+                }elseif($value->account_approved=='yes' && $value->forward_to_warehouse=='no'){
+                    $value->status = 'Verified';
+                }elseif($value->account_approved=='yes' && $value->forward_to_warehouse=='yes'){
+                    $value->status = 'Forwaded to warehouse';
+                }
                 $value->all_product = SaleDetail::where('tbl_sale_detail.order_no',$request->order_no)
                                     ->where('tbl_sale_detail.is_deleted','no')
                                     ->join('tbl_product','tbl_product.id','=','tbl_sale_detail.prod_id')
