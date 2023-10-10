@@ -361,8 +361,8 @@ function getSettings($type='')
  function send_notification($message,$send_to)
  {
     
-     $userToken = App\User::where(['id'=>$send_to,'is_block'=>'no','is_approved'=>'yes','is_deleted'=>'no', ])->pluck('app_token')->toArray();
-     $userId = App\User::where(['id'=>$send_to,'is_block'=>'no','is_approved'=>'yes','is_deleted'=>'no', ])->pluck('id')->toArray();
+     $userToken = App\User::select('app_token')->where(['id'=>$send_to,'is_block'=>'no','is_approved'=>'yes','is_deleted'=>'no', ])->get()->toArray();
+     $userId = App\User::select('id')->where(['id'=>$send_to,'is_block'=>'no','is_approved'=>'yes','is_deleted'=>'no', ])->get()->toArray();
 
      $fcm_server_keyFinal='AAAAog8TE8Y:APA91bFVPjkXqCY_Mube2butwlOz3x5RaVaJv5JYDXHV9AtJK96kFPrKZp3LCKqgG7PlZcWDqywPGlDUTkWBajmmoqqtxOAJkCmBbTyki8r6axzrF2i67oY3muMujYkaav3AYIKPwQJG';
      $title='Soil Charge Technology';
