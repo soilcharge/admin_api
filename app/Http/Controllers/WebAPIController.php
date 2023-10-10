@@ -3969,6 +3969,8 @@ class WebAPIController extends Controller
             
             if ($orderdetail)
             {
+                $message ="Your order is forwarded to warehouse";
+                send_notification($message,$request->created_disctributor_id);
                  return response()->json([
                     "data" => $orderdetail,
                     "result" => true,
