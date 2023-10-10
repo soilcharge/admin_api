@@ -43,6 +43,7 @@ class DistributorMobileAppController extends Controller
             $result = DB::table('tbl_product')
                     ->select('title','photo_one','id')
                     ->distinct('title')
+                    ->where('is_deleted','no')
                     ->get();
                 foreach ($result as $key => $value) {
                     $front_product_details = FrontProduct::where('product_id',$value->id)->select('short_description','long_description')->first();
