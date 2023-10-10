@@ -4453,7 +4453,7 @@ class DistributorController extends Controller
     // List Notification
     public function list_notification(Request $request)
     {
-        $result= Notification::where('distributor_id', '=', $request->distributor_id)->where('is_read','no')->get();
+        $result= Notification::where('distributor_id', '=', $request->distributor_id)->where('is_read','no')->orderBy('id','DESC')->get();
         foreach ($result as $key=>$distInfo)
         {
             //dd($distInfo->distributor_id);
