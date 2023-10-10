@@ -1353,8 +1353,17 @@ class DistributorControllerNandu extends Controller
                     ->get();
                     
             $salelist_by_date_recordcount=sizeof($salelist_by_date_record);
+            foreach($salelist_by_date_record as $key=>$resultnew)
+            {
+                if($resultnew->account_approved=='no' && $resultnew->forward_to_warehouse=='no'){
+                    $resultnew->status = 'Pending';
+                }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='no'){
+                    $resultnew->status = 'Verified';
+                }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='yes'){
+                    $resultnew->status = 'Forwaded to warehouse';
+                }
+            }
             if($salelist_by_date_recordcount>0)
-            
             {
                  return response()->json([
                     "data" => $salelist_by_date_record,
@@ -2190,17 +2199,19 @@ class DistributorControllerNandu extends Controller
     {
         try
         {
-           
-           
-
-
             $result = SaleSummary::where('is_deleted','no')
             ->where('tbl_sale_summary.order_no','like','%'.$request->order_no.'%')
             ->where('created_disctributor_id',$request->disctributor_id)
             ->get();
-
                 foreach($result as $key=>$resultnew)
                 {
+                    if($resultnew->account_approved=='no' && $resultnew->forward_to_warehouse=='no'){
+                        $resultnew->status = 'Pending';
+                    }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='no'){
+                        $resultnew->status = 'Verified';
+                    }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='yes'){
+                        $resultnew->status = 'Forwaded to warehouse';
+                    }
                     try
                     {
                         $details=$this->commonController->getUserNameById($resultnew->created_disctributor_id);                        
