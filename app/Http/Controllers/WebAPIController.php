@@ -3926,13 +3926,14 @@ class WebAPIController extends Controller
             
             if ($orderdetail)
             {
+                $message ="Your order is verified successfully";
+                send_notification($message,$requestdata->created_disctributor_id);
                  return response()->json([
                     "data" => $orderdetail,
                     "result" => true,
                     "message" => 'Order Verified Successfully'
                 ]);
-                $message ="Your order is verified successfully";
-                send_notification($message,$requestdata->created_disctributor_id);
+               
             }
             else
             {
