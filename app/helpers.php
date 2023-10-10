@@ -6,6 +6,7 @@
  * @param  string|null  $text
  * @return void
  */
+use App\Model\Notification;
 
 function getsettingfront($keyName)
 {
@@ -411,7 +412,7 @@ function getSettings($type='')
      foreach($userId as $key=>$userIdNew)
      {
 
-         $Notificationdetails = new App\Notification();
+         $Notificationdetails = new Notification();
          $Notificationdetails->distributor_id = $userIdNew;
          $Notificationdetails->message =$message;
          $Notificationdetails->save();
