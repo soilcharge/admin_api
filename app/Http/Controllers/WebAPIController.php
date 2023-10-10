@@ -3925,7 +3925,7 @@ class WebAPIController extends Controller
             
             if ($orderdetail)
             {
-                $message ="Your order no- ".$requestdata->order_no."is verified successfully";
+                $message ="Your order no- ".$requestdata->order_no." is verified successfully";
                 send_notification($message,$request->created_disctributor_id);
                  return response()->json([
                     "data" => $orderdetail,
@@ -3969,7 +3969,7 @@ class WebAPIController extends Controller
             
             if ($orderdetail)
             {
-                $message ="Your order no-".$requestdata->order_no."is forwarded to warehouse";
+                $message ="Your order no- ".$requestdata->order_no." is forwarded to warehouse";
                 send_notification($message,$request->created_disctributor_id);
                  return response()->json([
                     "data" => $orderdetail,
