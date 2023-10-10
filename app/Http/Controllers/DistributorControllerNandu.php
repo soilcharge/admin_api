@@ -1037,6 +1037,15 @@ class DistributorControllerNandu extends Controller
                     ->get();
                     
             $orderlist_by_date_recordcount=sizeof($orderlist_by_date_record);
+            foreach($orderlist_by_date_record as $key=>$resultnew)
+            {
+                if($resultnew->account_approved=='no' && $resultnew->forward_to_warehouse=='no'){
+                    $resultnew->status = 'Pending';
+                }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='no'){
+                    $resultnew->status = 'Verified';
+                }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='yes'){
+                    $resultnew->status = 'Forwaded to warehouse';
+                }
             if($orderlist_by_date_recordcount>0)
             
             {
