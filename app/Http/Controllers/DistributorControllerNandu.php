@@ -1046,6 +1046,7 @@ class DistributorControllerNandu extends Controller
                 }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='yes'){
                     $resultnew->status = 'Forwaded to warehouse';
                 }
+            }
             if($orderlist_by_date_recordcount>0)
             
             {
