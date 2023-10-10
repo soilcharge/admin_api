@@ -412,6 +412,13 @@ class DistributorMobileAppController extends Controller
         
             foreach($result as $key=>$value)
             {
+                if($value->account_approved=='no' && $value->forward_to_warehouse=='no'){
+                    $value->status = 'Pending';
+                }elseif($value->account_approved=='yes' && $value->forward_to_warehouse=='no'){
+                    $value->status = 'Verified';
+                }elseif($value->account_approved=='yes' && $value->forward_to_warehouse=='yes'){
+                    $value->status = 'Forwaded to warehouse';
+                }
                 //$value->all_product = OrderDetail::where('order_no',$request->order_no)->get();
                 
                 $value->all_product = OrderDetail::where('tbl_order_detail.order_no',$request->order_no)
