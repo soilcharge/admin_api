@@ -401,7 +401,7 @@ function getSettings($type='')
  
      $result = curl_exec($ch);
      if ($result === false) {
-          //dd("fail");
+          dd("fail");
          die('Curl failed:' . curl_errno($ch));
         
      }
@@ -411,6 +411,7 @@ function getSettings($type='')
 
      foreach($userId as $key=>$userIdNew)
      {
+        dd($userIdNew);
 
          $Notificationdetails = new Notification();
          $Notificationdetails->distributor_id = $userIdNew;
