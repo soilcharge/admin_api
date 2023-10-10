@@ -356,6 +356,87 @@ function getSettings($type='')
  * This method returns the role of the currently logged in user
  * @return [type] [description]
  */
+
+ function send_notification($message,$send_to)
+ {
+    
+     $userToken = App\User::where(['id'=>$send_to,'is_block'=>'no','is_approved'=>'yes','is_deleted'=>'no', ])->pluck('app_token')->toArray();
+     $userId = App\User::where(['id'=>$send_to,'is_block'=>'no','is_approved'=>'yes','is_deleted'=>'no', ])->pluck('id')->toArray();
+
+     $fcm_server_keyFinal='AAAAog8TE8Y:APA91bFVPjkXqCY_Mube2butwlOz3x5RaVaJv5JYDXHV9AtJK96kFPrKZp3LCKqgG7PlZcWDqywPGlDUTkWBajmmoqqtxOAJkCmBbTyki8r6axzrF2i67oY3muMujYkaav3AYIKPwQJG';
+     $title='Soil Charge Technology';
+     $icon='';
+     
+     $message = [
+             'title' => $title,
+             'body' => $message,
+             'icon' => $icon ,
+             'actions'=>'',
+             
+         ];
+     
+    
+     $fields = array(
+         'registration_ids' => $userToken,
+         //'registration_ids' =>['eF1zFcNQS0SstgXFONd_qq:APA91bHNPw6Ir_KaJsEw2riTRNHLIXd4KBkHeNUznDMa_StyYXgIKb4uVIrFvpw8k2Z0C9YLXakLOf6_dx18cLFDyU7F8-R6CWRc-VT7rOtWkCS4ofmIwv1BRVwLyZXzakDMHoYLZELl'],
+         'notification' => $message, //note: body & title fileds must be specified for the message or your only get just the vibration but the notification
+     );
+     $headers = array(
+         'Authorization: key=' .$fcm_server_keyFinal, //  FIREBASE_API_KEY_FOR_ANDROID_NOTIFICATION
+         'Content-Type: application/json'
+     );
+     // dd($headers);
+     //Open connection
+     $ch = curl_init();
+     //Set the url, number of POST vars, POST data
+     curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+     curl_setopt($ch, CURLOPT_POST, true);
+     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+     // Disabling SSL Certificate support temporarly
+     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
+ 
+     $result = curl_exec($ch);
+     if ($result === false) {
+          //dd("fail");
+         die('Curl failed:' . curl_errno($ch));
+        
+     }
+     // Close connection
+     curl_close($ch);
+     
+
+     foreach($userId as $key=>$userIdNew)
+     {
+
+         $Notificationdetails = new App\Notification();
+         $Notificationdetails->distributor_id = $userIdNew;
+         $Notificationdetails->message =$message;
+         $Notificationdetails->save();
+     }
+     
+         
+     
+     if($userId)
+     {
+          return response()->json([
+             "data" => $Notificationdetails,
+             "result" => true,
+             "message" => 'Notification Sent Successfully'
+         ]);
+     }
+     else
+     {
+          return response()->json([
+             "data" => '',
+             "result" => false,
+            "message" => 'Notification Not Sent'
+         ]);
+         
+     }
+ }
  function getRole($user_id = 0)
  {
      if($user_id)
