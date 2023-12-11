@@ -40,27 +40,41 @@ class DistributorMobileAppController extends Controller
         try
         {
         
-            $result = DB::table('tbl_product')
-                    ->select('title','photo_one','id')
-                    ->distinct('title')
-                    ->where('is_deleted','no')
-                    ->get();
-                foreach ($result as $key => $value) {
-                    $front_product_details = FrontProduct::where('product_id',$value->id)->select('short_description','long_description')->first();
-                    info($front_product_details);
-                    $value->product_id = $value->id;
-                    $value->short_description = $front_product_details ? $front_product_details->short_description  : '';
-                    $value->long_description = $front_product_details ? $front_product_details->long_description : '';
-                    $value->photopath=PRODUCT_CONTENT_VIEW.$value->photo_one;
-                    $data_count = ProductDetails::join('tbl_product','tbl_product_details.product_id','=','tbl_product.id')
-                                                    ->where('tbl_product_details.is_deleted','no')
-                                                    ->where('tbl_product.title',$value->title)
-                                                    ->where('tbl_product.is_deleted','no')
-                                                    ->orderBy('tbl_product.id', 'DESC')
-                                                    ->get();
+            // $result = DB::table('tbl_product')
+            //         ->select('title','photo_one','id')
+            //         ->distinct('title')
+            //         ->where('is_deleted','no')
+            //         ->get();
+            //     foreach ($result as $key => $value) {
+            //         $front_product_details = FrontProduct::where('product_id',$value->id)->select('short_description','long_description')->first();
+            //         info($front_product_details);
+            //         $value->product_id = $value->id;
+            //         $value->short_description = $front_product_details ? $front_product_details->short_description  : '';
+            //         $value->long_description = $front_product_details ? $front_product_details->long_description : '';
+            //         $value->photopath=PRODUCT_CONTENT_VIEW.$value->photo_one;
+            //         $data_count = ProductDetails::join('tbl_product','tbl_product_details.product_id','=','tbl_product.id')
+            //                                         ->where('tbl_product_details.is_deleted','no')
+            //                                         ->where('tbl_product.title',$value->title)
+            //                                         ->where('tbl_product.is_deleted','no')
+            //                                         ->orderBy('tbl_product.id', 'DESC')
+            //                                         ->get();
                     
-                    $value->product_details = $data_count;
-                }
+            //         $value->product_details = $data_count;
+            //     }
+
+
+            $result = ProductDetails::join('tbl_product','tbl_product_details.product_id','=','tbl_product.id')
+            ->where('tbl_product_details.is_deleted','no')
+            ->where('tbl_product.is_deleted','no')
+            ->select('tbl_product_details.*','tbl_product.title','tbl_product.content','tbl_product.link')
+            ->orderBy('tbl_product.id', 'DESC')
+            ->get();
+            
+            foreach($result as $key=>$value)
+            {
+                $value->photopath=PRODUCT_CONTENT_VIEW.$value->photo_one;
+            }
+
             if ($result)
             {
                  return response()->json([
