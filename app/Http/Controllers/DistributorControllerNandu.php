@@ -567,7 +567,7 @@ class DistributorControllerNandu extends Controller
     {
         try
         {
-            $messageview= Messages::where('is_deleted', 'no')->get();
+            $messageview= Messages::where('is_deleted', 'no')->orderBy('id', 'DESC')->get();
             
             if ($messageview)
             {
@@ -610,6 +610,7 @@ class DistributorControllerNandu extends Controller
         {
              $messagesearch= Messages::where('subject', 'like', '%' . $request->search . '%')
                     ->where('is_deleted','no')
+                    ->orderBy('id', 'DESC')
                     ->get();
             
             $messagesearchcount=sizeof($messagesearch);
@@ -654,6 +655,7 @@ class DistributorControllerNandu extends Controller
             $messagesearchbydate= Messages::where('message_by',$request->distributor_id)
                     ->where('is_deleted','no')
                     ->whereBetween('date', [$request->fromdate,$request->todate])
+                    ->orderBy('id', 'DESC')
                     ->get();
                     
             $messagesearchbydatecount=sizeof($messagesearchbydate);
@@ -724,6 +726,7 @@ class DistributorControllerNandu extends Controller
              $myvisit_date_filter= FarmerVistByDistributor::where('created_by',$request->created_by)
                     ->whereBetween('date', [$request->fromdate,$request->todate])
                      ->where('status',0)
+                     ->orderBy('id', 'DESC')
                     ->get();
                     
             $myvisit_date_filtercount=sizeof($myvisit_date_filter);
@@ -845,7 +848,7 @@ class DistributorControllerNandu extends Controller
         
         try
         {
-            $complaintview= Complaint::where('is_deleted', 'no')->get();
+            $complaintview= Complaint::where('is_deleted', 'no')->orderBy('id', 'DESC')->get();
             
             if ($complaintview)
             {
@@ -923,6 +926,7 @@ class DistributorControllerNandu extends Controller
         {
              $complaintsearch= Complaint::where('subject', 'like', '%' . $request->search . '%')
                     ->where('is_deleted','no')
+                    ->orderBy('id', 'DESC')
                     ->get();
             $Complaintcount=sizeof($complaintsearch);
             if ($Complaintcount>0)
@@ -965,6 +969,7 @@ class DistributorControllerNandu extends Controller
             $complaintsearchbydate= Complaint::where('is_deleted','no')
                     ->where('complaint_by',$request->distributor_id)
                     ->whereBetween('date', [$request->fromdate,$request->todate])
+                    ->orderBy('id', 'DESC')
                     ->get();
                     
             $complaintsearchbydatecount=sizeof($complaintsearchbydate);
@@ -1043,6 +1048,8 @@ class DistributorControllerNandu extends Controller
                     $resultnew->status = 'Pending';
                 }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='no'){
                     $resultnew->status = 'Verified';
+                }elseif($resultnew->order_dispatched=='yes'){
+                    $resultnew->status = 'Order Dispatched From warehouse';
                 }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='yes'){
                     $resultnew->status = 'Forwaded to warehouse';
                 }
@@ -1085,6 +1092,7 @@ class DistributorControllerNandu extends Controller
         {
              $videossearch= Video::where('title', 'like', '%' . $request->search . '%')
                     ->where('status',0)
+                    ->orderBy('id', 'DESC')
                     ->get();
             $videossearchcount=sizeof($videossearch);
             if ($videossearchcount>0)
@@ -1123,6 +1131,7 @@ class DistributorControllerNandu extends Controller
         {
              $video_search_by_date_record= Video::where('status',0)
                     ->whereBetween('created_at', [$request->fromdate,$request->todate])
+                    ->orderBy('id', 'DESC')
                     ->where('activeinactive',0)
                     ->get();
                     
@@ -1164,7 +1173,7 @@ class DistributorControllerNandu extends Controller
     {
         try
         {
-            $result = WebBlog::where(['status'=>0])->get();
+            $result = WebBlog::where(['status'=>0,'articleorschedule'=>'article'])->orderBy('id', 'DESC')->get();
             foreach($result as $key=>$value)
             {
                 $value->photopath=BLOG_CONTENT_VIEW.$value->photo_one;
@@ -1359,6 +1368,8 @@ class DistributorControllerNandu extends Controller
                     $resultnew->status = 'Pending';
                 }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='no'){
                     $resultnew->status = 'Verified';
+                }elseif($resultnew->order_dispatched=='yes'){
+                    $resultnew->status = 'Order Dispatched From warehouse';
                 }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='yes'){
                     $resultnew->status = 'Forwaded to warehouse';
                 }
@@ -1408,6 +1419,8 @@ class DistributorControllerNandu extends Controller
                     $resultnew->status = 'Pending';
                 }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='no'){
                     $resultnew->status = 'Verified';
+                }elseif($resultnew->order_dispatched=='yes'){
+                    $resultnew->status = 'Order Dispatched From warehouse';
                 }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='yes'){
                     $resultnew->status = 'Forwaded to warehouse';
                 }
@@ -1467,12 +1480,14 @@ class DistributorControllerNandu extends Controller
                     $value->status = 'Pending';
                 }elseif($value->account_approved=='yes' && $value->forward_to_warehouse=='no'){
                     $value->status = 'Verified';
+                }elseif($value->order_dispatched=='yes'){
+                    $value->status = 'Order Dispatched From warehouse';
                 }elseif($value->account_approved=='yes' && $value->forward_to_warehouse=='yes'){
                     $value->status = 'Forwaded to warehouse';
                 }
-                $value->all_product = SaleDetail::where('tbl_sale_detail.order_no',$request->order_no)
+                $value->all_product = SaleDetail::leftJoin('tbl_product','tbl_product.id','=','tbl_sale_detail.prod_id')
+                                    ->where('tbl_sale_detail.order_no',$request->order_no)
                                     ->where('tbl_sale_detail.is_deleted','no')
-                                    ->join('tbl_product','tbl_product.id','=','tbl_sale_detail.prod_id')
                                     ->get();
                 try
                 {
@@ -1958,6 +1973,7 @@ class DistributorControllerNandu extends Controller
                     ->where('is_deleted','no')
                     ->where('active','yes')
                     ->where('user_type','farmer')
+                    ->orderBy('id', 'DESC')
                     ->get();
                     
             $farmerlist_recorddcount=sizeof($farmerlist_record);
@@ -2089,6 +2105,7 @@ class DistributorControllerNandu extends Controller
         {
              $myvisit_search_by_visitno= FarmerVistByDistributor::where('visit_no',$request->visit_no)
                      ->where('status',0)
+                     ->orderBy('id', 'DESC')
                     ->get();
                     
             $myvisit_search_by_visitnocount=sizeof($myvisit_search_by_visitno);
@@ -2152,6 +2169,8 @@ class DistributorControllerNandu extends Controller
                     $resultnew->status = 'Pending';
                 }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='no'){
                     $resultnew->status = 'Verified';
+                }elseif($resultnew->order_dispatched=='yes'){
+                    $resultnew->status = 'Order Dispatched From warehouse';
                 }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='yes'){
                     $resultnew->status = 'Forwaded to warehouse';
                 }
@@ -2215,6 +2234,8 @@ class DistributorControllerNandu extends Controller
                         $resultnew->status = 'Pending';
                     }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='no'){
                         $resultnew->status = 'Verified';
+                    }elseif($resultnew->order_dispatched=='yes'){
+                     $resultnew->status = 'Order Dispatched From warehouse';
                     }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='yes'){
                         $resultnew->status = 'Forwaded to warehouse';
                     }

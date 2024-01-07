@@ -173,7 +173,8 @@ class DistributorController extends Controller
                 return response()->json([
                         "data" => '',
                         "result" => false,
-                        "message" =>$e->getMessage()." ".$e->getCode()
+                        // "message" =>$e->getMessage()." ".$e->getCode()
+                        "message" => "Some data missing or duplicate"
                     ]);
                
         }
@@ -619,6 +620,7 @@ class DistributorController extends Controller
             {
                 $value->new_user_type='';
             }
+
             $stateName=$this->commonController->getAreaNameById($value->state);
             $value->state=$stateName->name;
             
@@ -630,7 +632,9 @@ class DistributorController extends Controller
             
             $cityName=$this->commonController->getAreaNameById($value->city);
             
-            $value->city=isset($cityName->name)?$cityName:'-';
+            // $value->city=isset($cityName->name)?$cityName:'-';
+            $value->city=isset($cityName->name)?$cityName->name:'-';
+            // $value->city=$cityName->name?$cityName:'-';
         }
         // dd($result);
         if (count($result) > 0)
@@ -787,10 +791,11 @@ class DistributorController extends Controller
     
       public function farmer_registration_distributorapp(Request $request)
     {
+        try {
         $validator = Validator::make($request->all(), [
             'fname' => 'required',
-            'mname' => 'required',
-            'lname' => 'required',
+            // 'mname' => 'required',
+            // 'lname' => 'required',
             'email' => 'required',
             'password' => 'required',
             'aadharcard' => 'required',
@@ -813,7 +818,7 @@ class DistributorController extends Controller
         }
 
         $user = new User();
-        $user->name = $request->fname." ".$request->mname." ".$request->lname." ";
+        $user->name = $request->fname;
         $user->email = $request->email;
         $user->password = bcrypt($request->password);
         $user->visible_password =$request->password;
@@ -825,8 +830,8 @@ class DistributorController extends Controller
         $users = new UsersInfo();
         $users->user_id =$user->id;
         $users->fname = $request->fname;
-        $users->mname = $request->mname;
-        $users->lname = $request->lname;
+        $users->mname = $request->fname;
+        $users->lname =$request->fname;
         $users->aadharcard = $request->aadharcard;
         $users->email = $request->email;
         $users->phone = $request->phone;
@@ -881,6 +886,17 @@ class DistributorController extends Controller
                 "message" => 'Farmer Not Added'
             ]);
             
+        }
+        
+        }
+        catch(Exception $e) {
+                return response()->json([
+                        "data" => '',
+                        "result" => false,
+                        // "message" =>$e->getMessage()." ".$e->getCode()
+                        "message" => "Some data missing or duplicate"
+                    ]);
+               
         }
 
     }
@@ -1262,13 +1278,13 @@ class DistributorController extends Controller
               )
               ->orderBy('id','desc')
               ->get();
-            //   dd($farmerMeetingData);
+           info($farmerMeetingData);
             foreach($farmerMeetingData as $key=>$farmermeeting)
             {
                 try
                 {
-                     $presentFarmer = '';
-                     $presentFarmerFormeeting = '';
+                     $presentFarmer = null;
+                     $presentFarmerFormeeting = null;
                      $presentFarmer=explode(",",$farmermeeting->farmer_id);
                     //  if (str_contains(",", $farmermeeting->farmer_id)) {
                         
@@ -1277,7 +1293,7 @@ class DistributorController extends Controller
                     // }
                     
                     $presentFarmer= array_unique($presentFarmer);
-                    //dd($presentFarmer);
+                    info($presentFarmer);
                     // $distributordetails=$this->commonController->getDistributorNameById($farmermeeting->created_by);  
                     
                     // $farmermeeting->dfname=$distributordetails->fname;
@@ -1304,10 +1320,10 @@ class DistributorController extends Controller
                             $presentFarmerFormeeting .=",";
                             
                         }
-                        
+                         //$farmermeetingPresentDist->presentFarmerFormeeting= 
                     }
+                   $farmermeeting->presentFarmerFormeeting = rtrim($presentFarmerFormeeting, ',');
                    
-                    $farmermeeting->presentFarmerFormeeting= rtrim($presentFarmerFormeeting, ',');
 
                 } catch(Exception $e) {
                     return response()->json([
@@ -1354,7 +1370,7 @@ class DistributorController extends Controller
         {
             //dd($request->user_id);
             $presentFarmerFormeeting='';
-            $farmerMeetingData =FarmerMeeting::where('is_deleted','no')->where('created_by',$request->user_id)->get();
+            $farmerMeetingData =FarmerMeeting::where('is_deleted','no')->where('created_by',$request->user_id)->orderBy('id', 'DESC')->get();
             //$farmerMeetingData =FarmerMeeting::all();
             
             foreach($farmerMeetingData as $key=>$farmermeeting)
@@ -2038,6 +2054,7 @@ class DistributorController extends Controller
                   'tbl_farmer_vist_by_distributor.photo_two',
                   'tbl_farmer_vist_by_distributor.photo_three',
                   'tbl_farmer_vist_by_distributor.photo_four',
+                  'tbl_farmer_vist_by_distributor.photo_five',
                   'tbl_farmer_vist_by_distributor.acer',
                   'tbl_farmer_vist_by_distributor.description_about_visit',
                   'tbl_farmer_vist_by_distributor.about_visit',
@@ -2154,7 +2171,7 @@ class DistributorController extends Controller
     {
         try 
         {
-            $farmerVistByDistributor = FarmerVistByDistributor::where('created_by',$request->created_by)->where('status','0')->get();
+            $farmerVistByDistributor = FarmerVistByDistributor::where('created_by',$request->created_by)->where('status','0')->orderBy('id', 'DESC')->get();
             if(!$farmerVistByDistributor) {
                 throw new Exception(api_error(1006), 1006);
             }
@@ -2578,12 +2595,26 @@ class DistributorController extends Controller
     {
         try 
         {
-            $targetvideo = TargetVideosToDistributor::
-                            leftJoin('tbl_target_videos', function($join) {
-                                $join->on('tbl_target_videos_to_distributor.target_vedio_id','=','tbl_target_videos.id');
+            // $targetvideo = TargetVideosToDistributor::
+            //                 leftJoin('tbl_target_videos', function($join) {
+            //                     $join->on('tbl_target_videos_to_distributor.target_vedio_id','=','tbl_target_videos.id');
+            //                 })
+            //                 ->where(['tbl_target_videos.is_deleted'=>'no'])
+            //                 ->select( 'tbl_target_videos.id as id','tbl_target_videos_to_distributor.target_vedio_id','tbl_target_videos_to_distributor.dist_id','tbl_target_videos_to_distributor.date','tbl_target_videos_to_distributor.is_deleted','tbl_target_videos_to_distributor.active','tbl_target_videos_to_distributor.is_watched',
+            //                  'tbl_target_videos.title as title','tbl_target_videos.description as description','tbl_target_videos.language as language','tbl_target_videos.url as url','tbl_target_videos.to_whom_show as to_whom_show')
+            //                 ->orderBy('tbl_target_videos_to_distributor.id', 'desc')
+            //                 ->get();
+                            
+                            
+                      $targetvideo = TargetVideos:: leftJoin('tbl_target_videos_to_distributor', function($join) {
+                                $join->on('tbl_target_videos.id','=','tbl_target_videos_to_distributor.target_vedio_id');
+                                
                             })
-                            ->where('tbl_target_videos_to_distributor.is_deleted','no')
+                            ->where(['tbl_target_videos.is_deleted'=>'no'])
+                            ->select( 'tbl_target_videos.id as id','tbl_target_videos_to_distributor.target_vedio_id','tbl_target_videos_to_distributor.dist_id','tbl_target_videos_to_distributor.date','tbl_target_videos_to_distributor.is_deleted','tbl_target_videos_to_distributor.active','tbl_target_videos_to_distributor.is_watched',
+                             'tbl_target_videos.title as title','tbl_target_videos.description as description','tbl_target_videos.language as language','tbl_target_videos.url as url','tbl_target_videos.to_whom_show as to_whom_show')
                             ->orderBy('tbl_target_videos_to_distributor.id', 'desc')
+                            
                             ->get();
           
             if(!$targetvideo) {
@@ -2605,7 +2636,9 @@ class DistributorController extends Controller
                     //     throw new Exception('unable to get ditributor details');
                     // }
                     
-                    $targetvideoNew->dfname=$distributordetails ? $distributordetails->fname : '' ;
+                        $targetvideoNew->dfname=$distributordetails ? $distributordetails->fname : '' ;
+                    
+                    
                     $targetvideoNew->dmname=$distributordetails ? $distributordetails->mname : '' ;
                     $targetvideoNew->dlname=$distributordetails ? $distributordetails->lname : '' ;
                     
@@ -2652,7 +2685,7 @@ class DistributorController extends Controller
     {
         try 
         {
-            $targetvideo = TargetVideosToDistributor::where('dist_id',$request->user_id)->where('is_deleted','no')->get();
+            $targetvideo = TargetVideosToDistributor::where('dist_id',$request->user_id)->where('is_deleted','no')->orderBy('id', 'DESC')->get();
             
             if(!$targetvideo) {
                 throw new Exception(api_error(1006), 1006);
@@ -2713,7 +2746,8 @@ class DistributorController extends Controller
     
     public function distributortargetvideodelete_distributorweb(Request $request)
     {
-        $targetvideo = TargetVideosToDistributor::where('id',$request->video_id)->update(['is_deleted'=>'yes']);
+        info($request->video_id);
+        $targetvideo = TargetVideos::where('id',$request->video_id)->update(['is_deleted'=>'yes']);
       
         if ($targetvideo)
         {
@@ -2772,10 +2806,10 @@ class DistributorController extends Controller
         }
        
        
-        if ($targetvideo)
+        if ($alldist)
         {
              return response()->json([
-                "data" => $targetvideo,
+                "data" => $alldist,
                 "result" => true,
                 "message" => 'Target Videos To Distributor Added Successfully'
             ]);
@@ -3404,6 +3438,7 @@ class DistributorController extends Controller
                         "tbl_target_videos_to_distributor.date",
                         "tbl_target_videos_to_distributor.is_watched"
                     )
+                    ->orderBy('tbl_target_videos.id', 'DESC')
                     ->get();
             if(!$targetvideo) {
                 throw new Exception(api_error(1006), 1006);
@@ -3619,6 +3654,7 @@ class DistributorController extends Controller
                         "tbl_target_videos_to_distributor.date",
                         "tbl_target_videos_to_distributor.is_watched"
                     )
+                    ->orderBy('tbl_target_videos.id', 'DESC')
                     ->get();
                     
       
@@ -4345,7 +4381,7 @@ class DistributorController extends Controller
         $userToken = User::where(['user_type'=>$send_to,'is_block'=>'no','is_approved'=>'yes','is_deleted'=>'no', ])->pluck('app_token')->toArray();
         $userId = User::where(['user_type'=>$send_to,'is_block'=>'no','is_approved'=>'yes','is_deleted'=>'no', ])->pluck('id')->toArray();
 
-        $fcm_server_keyFinal='AAAAog8TE8Y:APA91bFVPjkXqCY_Mube2butwlOz3x5RaVaJv5JYDXHV9AtJK96kFPrKZp3LCKqgG7PlZcWDqywPGlDUTkWBajmmoqqtxOAJkCmBbTyki8r6axzrF2i67oY3muMujYkaav3AYIKPwQJG';
+        $fcm_server_keyFinal='AAAANa2pzJY:APA91bHa0b1JRFJY2OJHo7odte-QB6rh0HXmuxqACsv0Q3duY7uzDrEcHYkWLDksH1HxACaNsGM35YO92GFU-YtnXIG6VzKb6fTa7v1c2DBS5YsSptEQqzl0bWKMP0UqCVujvoI_AZNL';
         $title='Soil Charge Technology';
         $icon='';
         
@@ -4381,6 +4417,7 @@ class DistributorController extends Controller
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
     
         $result = curl_exec($ch);
+        info($result);
         if ($result === false) {
              //dd("fail");
             die('Curl failed:' . curl_errno($ch));

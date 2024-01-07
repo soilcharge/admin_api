@@ -39,12 +39,35 @@ class DistributorMobileAppController extends Controller
     {
         try
         {
+            
+              $result = ProductDetails::leftJoin('tbl_product','tbl_product_details.product_id','=','tbl_product.id')
+              ->leftJoin('front_product','tbl_product.id','=','front_product.product_id')
+          ->distinct('tbl_product.title')
+            ->where('tbl_product_details.is_deleted','no')
+            ->where('tbl_product.is_deleted','no')
+             ->distinct('tbl_product.title')
+            ->select('tbl_product_details.*','tbl_product.*','front_product.*')
+            ->orderBy('tbl_product.id', 'DESC')
+            ->get();
+            
         
-            $result = DB::table('tbl_product')
-                    ->select('title','photo_one','id')
-                    ->distinct('title')
-                    ->where('is_deleted','no')
-                    ->get();
+            // $result = DB::table('tbl_product')
+            //         ->select('title','photo_one','id')
+            //         ->distinct('title')
+            //         // ->groupBy('id')
+            //         ->where('is_deleted','no')
+            //         ->get();
+            
+               $result = ProductDetails::leftJoin('tbl_product','tbl_product_details.product_id','=','tbl_product.id')
+              ->leftJoin('front_product','tbl_product.id','=','front_product.product_id')
+          ->distinct('tbl_product.title')
+            ->where('tbl_product_details.is_deleted','no')
+            ->where('tbl_product.is_deleted','no')
+             ->distinct('tbl_product.title')
+            ->select('tbl_product_details.*','tbl_product.*','front_product.*')
+            ->orderBy('tbl_product.id', 'DESC')
+            ->get();
+
                 foreach ($result as $key => $value) {
                     $front_product_details = FrontProduct::where('product_id',$value->id)->select('short_description','long_description')->first();
                     info($front_product_details);
@@ -61,6 +84,84 @@ class DistributorMobileAppController extends Controller
                     
                     $value->product_details = $data_count;
                 }
+            
+            
+           
+            
+            foreach($result as $key=>$value)
+            {
+                $value->photopath=PRODUCT_CONTENT_VIEW.$value->photo_one;
+            }
+
+
+            if ($result)
+            {
+                 return response()->json([
+                    "data" => $result,
+                    "result" => true,
+                    "message" => 'Information get Successfully'
+                ]);
+            }
+            else
+            {
+                 return response()->json([
+                    "data" => '',
+                    "result" => false,
+                    "message" => 'Information not found'
+                ]);
+                
+            }
+        }
+        catch(Exception $e) {
+          return  'Message: ' .$e->getMessage();
+        }
+       
+    }
+    
+    public function allproductlist_mobileapp_first(Request $request)
+    {
+        try
+        {
+        
+            // $result = DB::table('tbl_product')
+            //         ->select('title','photo_one','id')
+            //         ->distinct('title')
+            //         ->where('is_deleted','no')
+            //         ->get();
+            //     foreach ($result as $key => $value) {
+            //         $front_product_details = FrontProduct::where('product_id',$value->id)->select('short_description','long_description')->first();
+            //         info($front_product_details);
+            //         $value->product_id = $value->id;
+            //         $value->short_description = $front_product_details ? $front_product_details->short_description  : '';
+            //         $value->long_description = $front_product_details ? $front_product_details->long_description : '';
+            //         $value->photopath=PRODUCT_CONTENT_VIEW.$value->photo_one;
+            //         $data_count = ProductDetails::join('tbl_product','tbl_product_details.product_id','=','tbl_product.id')
+            //                                         ->where('tbl_product_details.is_deleted','no')
+            //                                         ->where('tbl_product.title',$value->title)
+            //                                         ->where('tbl_product.is_deleted','no')
+            //                                         ->orderBy('tbl_product.id', 'DESC')
+            //                                         ->get();
+                    
+            //         $value->product_details = $data_count;
+            //     }
+            
+            
+              $result = ProductDetails::join('tbl_product','tbl_product_details.product_id','=','tbl_product.id')
+              ->leftJoin('front_product','tbl_product.id','=','front_product.product_id')
+           
+            ->where('tbl_product_details.is_deleted','no')
+            ->where('tbl_product.is_deleted','no')
+             ->distinct('tbl_product.title')
+            ->select('tbl_product_details.*','tbl_product.*','front_product.*')
+            ->orderBy('tbl_product.id', 'DESC')
+            ->get();
+            
+            foreach($result as $key=>$value)
+            {
+                $value->photopath=PRODUCT_CONTENT_VIEW.$value->photo_one;
+            }
+
+
             if ($result)
             {
                  return response()->json([
@@ -358,6 +459,8 @@ class DistributorMobileAppController extends Controller
                     $resultnew->status = 'Pending';
                 }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='no'){
                     $resultnew->status = 'Verified';
+                }elseif( $resultnew->order_dispatched=='yes'){
+                    $resultnew->status = 'Order Dispatched From Warehouse';
                 }elseif($resultnew->account_approved=='yes' && $resultnew->forward_to_warehouse=='yes'){
                     $resultnew->status = 'Forwaded to warehouse';
                 }
@@ -416,6 +519,8 @@ class DistributorMobileAppController extends Controller
                     $value->status = 'Pending';
                 }elseif($value->account_approved=='yes' && $value->forward_to_warehouse=='no'){
                     $value->status = 'Verified';
+                }elseif( $value->order_dispatched=='yes') {
+                    $value->status = 'Order Dispatched From Warehouse';
                 }elseif($value->account_approved=='yes' && $value->forward_to_warehouse=='yes'){
                     $value->status = 'Forwaded to warehouse';
                 }

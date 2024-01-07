@@ -87,6 +87,42 @@ class WebAPIController extends Controller
        // $this->commonController->validateToken($this->user);
     }
     
+    
+     public function career_list_web(Request $request)
+    {
+        try
+        {
+            $result = Career::where('is_deleted','no')->orderBy('id', 'ASC')->get();
+            foreach($result as $key=>$value)
+            {
+                $value->internshipmenuphoto=WEB_CAREER_VIEW.$value->internshipmenuphoto;
+                $value->dsitmenuphotoview=WEB_CAREER_VIEW.$value->dsitmenuphotoview;
+                $value->jobmenuphotoview=WEB_CAREER_VIEW.$value->jobmenuphotoview;
+                $value->certificatephotoview=WEB_CAREER_VIEW.$value->certificatephotoview;
+            }
+            if ($result)
+            {
+                 return response()->json([
+                    "data" => $result,
+                    "result" => true,
+                    "message" => 'Information get Successfully'
+                ]);
+            }
+            else
+            {
+                 return response()->json([
+                    "data" => '',
+                    "result" => false,
+                    "message" => 'Information not found'
+                ]);
+                
+            }
+        }
+        catch(Exception $e) {
+          return  'Message: ' .$e->getMessage();
+        }
+    }
+    
  
     public function plotvisitlist_web(Request $request)
     {
@@ -1569,7 +1605,7 @@ class WebAPIController extends Controller
     
     public function webvideoget(Request $request)
     {
-        $targetvideo = WebVideos::where('id',$request->id)->where('status',0)->get();
+        $targetvideo = WebVideos::where('id',$request->id)->orderBy('id','DESC')->where('status',0)->get();
       
         if ($targetvideo)
         {
@@ -3425,7 +3461,9 @@ class WebAPIController extends Controller
         try
         {
             $result = WebAgency::join('usersinfo','usersinfo.user_id','=','tbl_agency_detail.agency_under_distributor_id')
-            ->where('tbl_agency_detail.is_deleted','no')->orderBy('tbl_agency_detail.id', 'DESC')->get();
+            ->where('tbl_agency_detail.is_deleted','no')->orderBy('tbl_agency_detail.id', 'DESC')
+            ->select( 'tbl_agency_detail.id', 'tbl_agency_detail.agency_name', 'tbl_agency_detail.lat', 'tbl_agency_detail.lon', 'tbl_agency_detail.agency_under_distributor_id',
+            'tbl_agency_detail.address', 'tbl_agency_detail.photo_one')->get();
             foreach($result as $key=>$value)
             {
                 $value->photopath=AGENCY_PHOTO_VIEW.$value->photo_one;
@@ -3830,7 +3868,19 @@ class WebAPIController extends Controller
         try
         {
              $result = OrderSummary::where('tbl_order_summary.is_deleted','no')->orderBy('id', 'DESC')->get();
+     
+                    
+                    
+            // $users = DB::table('tbl_sale_summary')
+            //      ->select('order_no', 'order_date', 'order_created_by', 'created_disctributor_id', 'created_disctributor_amount', 'dispatched_to_created_disctributor_by_warehouse', 'forwarded_bsc_id', 'forwarded_bsc_amount', 'dispatched_to_forwarded_bsc_by_warehouse', 'forwarded_dsc_id', 'forwarded_dsc_amount', 'dispatched_to_forwarded_dsc_amount_by_warehouse', 'account_approved', 'forward_to_warehouse', 'entry_by', 'order_dispatched', 'order_dispatched_date')
+            //     ->get();
             
+            // $employees = DB::table('tbl_order_summary')
+            //   ->select('order_no', 'order_date', 'order_created_by', 'created_disctributor_id', 'created_disctributor_amount', 'dispatched_to_created_disctributor_by_warehouse', 'forwarded_bsc_id', 'forwarded_bsc_amount', 'dispatched_to_forwarded_bsc_by_warehouse', 'forwarded_dsc_id', 'forwarded_dsc_amount', 'dispatched_to_forwarded_dsc_amount_by_warehouse', 'account_approved', 'forward_to_warehouse', 'entry_by', 'order_dispatched', 'order_dispatched_date')
+            //     ->get();
+            
+            // $result = $users->union($employees);
+        
             foreach($result as $key=>$resultnew)
             {
                 try
@@ -7665,7 +7715,7 @@ class WebAPIController extends Controller
     {
         try
         {
-            $result = WebInternship::where('is_deleted','no')->orderBy('id', 'ASC')->get();
+            $result = WebInternship::where('is_deleted','no')->orderBy('id', 'desc')->get();
             foreach($result as $key=>$value)
             {
                 $value->photopath=INTERNSHIP_CONTENT_VIEW.$value->resume;
@@ -8428,16 +8478,37 @@ class WebAPIController extends Controller
             
             
             $bstateName=$this->commonController->getAreaNameById($value->business_state);
-            $value->business_state=$bstateName->name;
+            if($bstateName) {
+                $value->business_state=$bstateName->name;
+            } else {
+                $value->business_state='';
+            }
+
             
             $bdistrictName=$this->commonController->getAreaNameById($value->business_district);
-            $value->business_district=$bdistrictName->name;
+             if($bdistrictName) {
+                $value->business_district=$bdistrictName->name;
+            } else {
+                $value->business_district='';
+            }
+            // $value->business_district=$bdistrictName->name;
             
             $btalukaName=$this->commonController->getAreaNameById($value->business_tuluka);
-            $value->business_tuluka=$btalukaName->name;
+             if($btalukaName) {
+                $value->business_tuluka=$btalukaName->name;
+            } else {
+                $value->business_tuluka='';
+            }
+            // $value->business_tuluka=$btalukaName->name;
             
             $bcityName=$this->commonController->getAreaNameById($value->business_village);
-            $value->business_village=$bcityName->name;
+             if($bcityName) {
+                $value->business_village=$bcityName->name;
+            } else {
+                $value->business_village='';
+            }
+            
+            // $value->business_village=$bcityName->name;
             
             
             $value->aadhar_card_image_front=FRONT_DISTRIBUTOR_OWN_DOCUMENTS_VIEW.$value->aadhar_card_image_front;
