@@ -161,7 +161,6 @@ class DistributorMobileAppController extends Controller
                 $value->photopath=PRODUCT_CONTENT_VIEW.$value->photo_one;
             }
 
-
             if ($result)
             {
                  return response()->json([
